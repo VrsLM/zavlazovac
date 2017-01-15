@@ -19,7 +19,7 @@ void usart_init(void);
 
 void ADC1_IRQHandler(void);
 void USART1_IRQHandler(void);
-
+void calculateTemperatureToCelsius(uint16_t ADCvalue_term, float *celsiusF);
 
 #endif /* VRS_CV5_H_ */
 

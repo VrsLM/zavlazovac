@@ -9,6 +9,7 @@
 #include <logic.h>
 
 uint16_t ADCvalue = 0;
+float celsius;
 uint8_t pom = 0;
 extern char poleChar[10];
 uint8_t Posielaj=0;
@@ -17,15 +18,15 @@ uint8_t i=0;
 /////////**************init led***************////
 void LED_init (void)
 {
-	  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
 
-	  GPIO_InitTypeDef GPIO_InitStruct;
-	  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-	  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_40MHz;
-	  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-	  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
-	  GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_8;
-	  GPIO_Init(GPIOA, &GPIO_InitStruct);
+	GPIO_InitTypeDef GPIO_InitStruct;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_40MHz;
+	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8;
+	GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
 
@@ -192,4 +193,9 @@ void USART2_IRQHandler()
 	}
 }
 
+void calculateTemperatureToCelsius(uint16_t ADCvalue_term, float  *celsiusF) {
+	float milivolts = (ADCvalue_term * 3.29 / 4095) * 100;
+	celsius = milivolts - 273;
+	*celsiusF=celsius;
+}
 

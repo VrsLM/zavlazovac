@@ -20,7 +20,7 @@ Status readDataGY_30(unsigned int*data) {
 			0b1011100 << 1);
 
 	*data = (buffer[0] << 8) + buffer[1];
-	*data = (*data) / 1.2;
 
+	*data = (*data) / 1.2;
 	return error;
 }
