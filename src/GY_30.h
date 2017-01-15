@@ -15,6 +15,6 @@
 #define GY_30_ONE_TIME_HIGH_RES_MODE 0x20
 
 Status initGY_30(void);
-Status readDataGY_30(unsigned int*data);
+Status readDataGY_30(int*data);
 
 #endif /* GY_30_H_ */

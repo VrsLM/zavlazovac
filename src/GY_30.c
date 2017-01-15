@@ -13,7 +13,7 @@ Status initGY_30(void) {
 	return error;
 }
 
-Status readDataGY_30(unsigned int*data) {
+Status readDataGY_30(int *data) {
 	unsigned char buffer[2];
 
 	Status error = I2C_Master_BufferReadWithoutRegisterAddress(buffer, 2,

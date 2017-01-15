@@ -8,10 +8,15 @@
 
 #include <busControler.h>
 
+int ADCvalue_term;
+int ADCvalue_humidity;
+int I2C_data;
+float celsiusF;
+
 char poleChar[40];
 uint16_t ADCvalue = 0;
 uint8_t pom = 0;
-uint8_t index=0;
+uint8_t index = 0;
 
 
 void adc_init(void)
@@ -171,7 +176,7 @@ void USART2_IRQHandler()
 	}
 }
 
-uint16_t readADC1_temp(uint8_t channel) {
+int readADC1_temp(uint8_t channel) {
 	ADC_RegularChannelConfig(ADC1, channel, 1, ADC_SampleTime_384Cycles);
 	// Start the conversion
 	ADC_SoftwareStartConv(ADC1);

@@ -10,13 +10,23 @@
 
 #include "stm32l1xx.h"
 #include <stdio.h>
+#include <busControler.h>
 
 void delay1000(int t);
 
 void printTemperatur(float *celsiusF);
-void printHumidity(uint16_t *ADCvalue_humidity);
-void printLightingX(unsigned int I2C_data);
+void printHumidity(int *ADCvalue_humidity);
+void printLightingX(int I2C_data);
 
-void calculateTemperatureToCelsius(uint16_t ADCvalue_term, float *celsiusF);
+void calculateTemperatureToCelsius(int ADCvalue_term, float *celsiusF);
+
+void startSystem();
+void blinking(int time, int count);
+
+void setWarm(float celsius);
+void setDrought(int ADCvalue_humidity);
+void setShining(int I2C_data);
+
+void controlWatering();
 
 #endif /* LOGICUTILS_H_ */

@@ -13,11 +13,11 @@
 void adc_init(void);
 void gpio_init(void);
 void usart_init(void);
-void LED_init (void);
+void LED_init(void);
 
 void ADC1_IRQHandler(void);
 void USART1_IRQHandler(void);
-uint16_t readADC1_temp(uint8_t channel);
+int readADC1_temp(uint8_t channel);
 
 #endif /* VRS_CV5_H_ */
 
