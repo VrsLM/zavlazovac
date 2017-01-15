@@ -1,5 +1,5 @@
-#include <logic.h>
-#include "logicUtils.h"
+#include <busControler.h>
+#include <logicUtils.h>
 #include <stddef.h>
 #include "stm32l1xx.h"
 #include <stdio.h>
@@ -20,11 +20,9 @@ int main(void) {
 	LED_init();
 	Status stat = initGY_30();
 
-
-//	startSystem();
+	startSystem();
 
 	while (1) {
-		GPIO_WriteBit(GPIOA, GPIO_Pin_8, Bit_SET); // zasvietenie LED
 
 //***********teplota*********************//
 		ADCvalue_term = readADC1_temp(ADC_Channel_0);
@@ -39,20 +37,75 @@ int main(void) {
 		readDataGY_30(&I2C_data);
 		printLightingX(I2C_data);
 
-		GPIO_WriteBit(GPIOA, GPIO_Pin_8, Bit_RESET); // zhasnutie LED
-
-		/**********delay****************************/ //
-		delay1000(1000);
+		controlWatering();
 
 	}
 	return 0;
 }
 
-conrrolWatering(){
-
-
+void startSystem() {
+	blinking(50, 5);
+	delay1000(1000 );
 }
 
+void blinking(int time, int count) {
+	for (int j = 1; j <= count; j++){
+		GPIO_ToggleBits(GPIOA, GPIO_Pin_8);
+		delay1000(time);
+	}
+		GPIO_WriteBit(GPIOA, GPIO_Pin_8, Bit_RESET);
+	delay1000(1000);
+}
+
+void controlWatering() {
+
+	if (isDrought() == 3) {
+		// je moc mokro, nepolievaj nic
+		GPIO_WriteBit(GPIOA, GPIO_Pin_8, Bit_RESET);
+		delay1000(100);
+	} else if (isDrought() == 1 && (isWarm() == 1 || isShining() == 1)) {
+		// sucho  & chladno | noc ->> polievaj naplno
+		blinking(20, 40);
+	} else if ((isDrought() == 1 || isDrought() == 2)
+			&& (isWarm() == 2 || isShining() == 2)) {
+		// sucho  & mierne teplo | den ->> polievaj miernejsie ( moze to byt rano alebo nejaky jarny/jesenny den)
+		blinking(100, 10);
+	} else if (isWarm() == 3 && isShining() == 3) {
+		// velke teplo | slnecny den ->> NEPOLIEVAJ
+		GPIO_WriteBit(GPIOA, GPIO_Pin_8, Bit_RESET);
+		delay1000(100);
+	}
+}
+
+int isWarm() {
+	if (celsiusF < 23) {
+		return 1; // polievaj naplno - je chladno
+	} else if (23 <= celsiusF && celsiusF < 30) {
+		return 2; // polievaj naplno je teplo
+	} else {
+		return 3; // nepolievaj - je horuco (nad 30 stupnov)
+	}
+}
+
+int isDrought() {
+	if (ADCvalue_humidity > 2500) {
+		return 1; // polievaj - sucho
+	} else if (ADCvalue_humidity > 1500 && ADCvalue_humidity <= 2500) {
+		return 2; // polievaj = mierne sucho
+	} else {
+		return 3; // nepolievaj - mokro jak slak
+	}
+}
+
+int isShining() {
+	if (I2C_data < 20) {
+		return 1; // polievaj naplno - je noc (pritmie)
+	} else if (20 <= I2C_data && I2C_data < 15000) {
+		return 2; // polievaj uvazne - je den
+	} else {
+		return 3; // nepolievaj - je jasny slnecny den
+	}
+}
 
 
 #ifdef  USE_FULL_ASSERT

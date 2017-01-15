@@ -4,11 +4,11 @@
  *  Created on: 15. 1. 2017
  *      Author: Lukas
  */
-#include "logicUtils.h"
+#include <logicUtils.h>
 #include "stm32l1xx.h"
 #include <stdio.h>
 
-char poleChar[10];
+char poleChar[40];
 
 void delay1000(int t) {
 	for (uint32_t i = 1; i < 1000 * t; i++)
@@ -44,3 +44,7 @@ void calculateTemperatureToCelsius(uint16_t ADCvalue_term, float *celsiusF) {
 	float milivolts = (ADCvalue_term * 3.29 / 4095) * 100;
 	*celsiusF = milivolts - 273;
 }
+
+
+
+

@@ -6,9 +6,9 @@
  *      Author: Marek
  */
 
-#include <logic.h>
+#include <busControler.h>
 
-char poleChar[10];
+char poleChar[40];
 uint16_t ADCvalue = 0;
 uint8_t pom = 0;
 uint8_t index=0;
