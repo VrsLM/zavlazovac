@@ -193,9 +193,5 @@ void USART2_IRQHandler()
 	}
 }
 
-void calculateTemperatureToCelsius(uint16_t ADCvalue_term, float  *celsiusF) {
-	float milivolts = (ADCvalue_term * 3.29 / 4095) * 100;
-	celsius = milivolts - 273;
-	*celsiusF=celsius;
-}
+
 

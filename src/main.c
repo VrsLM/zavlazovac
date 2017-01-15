@@ -6,6 +6,7 @@
 #include "i2c.h"
 #include "GY_30.h"
 
+
 char poleChar[10];
 uint16_t ADCvalue_term;
 uint16_t ADCvalue_humidity;
@@ -21,61 +22,33 @@ int main(void) {
 	LED_init();
 	Status stat = initGY_30();
 
+//	startSystem();
+
 	while (1) {
 		GPIO_WriteBit(GPIOA, GPIO_Pin_8, Bit_SET); // zasvietenie LED
 
 //***********teplota*********************//
 		ADCvalue_term = readADC1_temp(ADC_Channel_0);
 		calculateTemperatureToCelsius(ADCvalue_term, &celsiusF);
-		printTemperatur();
+		printTemperatur(&celsiusF);
 
 //***********vlhkomer*********************//
 		ADCvalue_humidity = readADC1_temp(ADC_Channel_1);
-		printHumidity();
+		printHumidity(&ADCvalue_humidity);
 
-//*********** read value from light senzo and print *********************/
-		//printLighting();
-		printLightingX(I2C_data, poleChar);
+//*********** read value from light senzor and print *********************/
+		printLightingX(I2C_data);
 
-		GPIO_WriteBit(GPIOA, GPIO_Pin_8, Bit_RESET); // zasvietenie LED
+		GPIO_WriteBit(GPIOA, GPIO_Pin_8, Bit_RESET); // zhasnutie LED
 
-/**********delay****************************///
+		/**********delay****************************/ //
 		delay1000(1000);
 
 	}
 	return 0;
 }
 
-void delay1000(int t) {
-	for (uint32_t i = 1; i < 1000 * t; i++)
-		;
-}
 
-void printTemperatur() {
-	int celeCislo, desatinneCislo;
-
-	celeCislo = (int) celsiusF;
-	desatinneCislo = ((int) (celsiusF * 100) % 100);
-	sprintf(poleChar, "teplota: %d.%d [C]\r\n", celeCislo, desatinneCislo);
-	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
-	delay1000(100);
-}
-
-void printHumidity() {
-	//***********vlhkomer*********************//
-	sprintf(poleChar, "vlhkomer: %d \r\n", ADCvalue_humidity);
-	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
-	delay1000(100);
-}
-
-void printLightingX(unsigned int I2C_data, char poleChar[10]) {
-	readDataGY_30(&I2C_data);
-
-	//printLighting();
-	sprintf(poleChar, "svetlo: %d [lux]\r\n\n", I2C_data);
-	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
-	delay1000(100);
-}
 
 
 
