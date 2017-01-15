@@ -6,14 +6,12 @@
 #include "i2c.h"
 #include "GY_30.h"
 
-extern uint16_t ADCvalue;
-extern uint8_t pom;
 char poleChar[10];
 uint16_t ADCvalue_term;
 uint16_t ADCvalue_humidity;
-unsigned int data;
+unsigned int I2C_data;
+float celsiusF;
 
-int celeCislo, desatinneCislo;
 
 int main(void) {
 	gpio_init();
@@ -28,37 +26,56 @@ int main(void) {
 
 //***********teplota*********************//
 		ADCvalue_term = readADC1_temp(ADC_Channel_0);
-		celeCislo = (int) ((100 * ADCvalue_term * 3.29 / 4095) - 273);
-		desatinneCislo = (int) ((100 * ADCvalue * 329 / 4095) - 273) % 100;
-
-		sprintf(poleChar, "teplota: %d.%d [C]\r\n", celeCislo, desatinneCislo);
-		USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
-		for (uint32_t i = 1; i < 100000; i++)
-			;
+		calculateTemperatureToCelsius(ADCvalue_term, &celsiusF);
+		printTemperatur();
 
 //***********vlhkomer*********************//
 		ADCvalue_humidity = readADC1_temp(ADC_Channel_1);
-		sprintf(poleChar, "vlhkomer: %d \r\n", ADCvalue_humidity);
-		USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
-		for (uint32_t i = 1; i < 100000; i++)
-			;
+		printHumidity();
 
-//*********** read value from light senzo *********************/
-
-		stat = readDataGY_30(&data);
-		sprintf(poleChar, "svetlo: %d [lux]\r\n\n", data);
-		USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
+//*********** read value from light senzo and print *********************/
+		//printLighting();
+		printLightingX(I2C_data, poleChar);
 
 		GPIO_WriteBit(GPIOA, GPIO_Pin_8, Bit_RESET); // zasvietenie LED
-				/**********delay****************************///
-		for (uint32_t i = 1; i < 1000000; i++)
-			;
+
+/**********delay****************************///
+		delay1000(1000);
 
 	}
 	return 0;
 }
 
+void delay1000(int t) {
+	for (uint32_t i = 1; i < 1000 * t; i++)
+		;
+}
 
+void printTemperatur() {
+	int celeCislo, desatinneCislo;
+
+	celeCislo = (int) celsiusF;
+	desatinneCislo = ((int) (celsiusF * 100) % 100);
+	sprintf(poleChar, "teplota: %d.%d [C]\r\n", celeCislo, desatinneCislo);
+	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
+	delay1000(100);
+}
+
+void printHumidity() {
+	//***********vlhkomer*********************//
+	sprintf(poleChar, "vlhkomer: %d \r\n", ADCvalue_humidity);
+	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
+	delay1000(100);
+}
+
+void printLightingX(unsigned int I2C_data, char poleChar[10]) {
+	readDataGY_30(&I2C_data);
+
+	//printLighting();
+	sprintf(poleChar, "svetlo: %d [lux]\r\n\n", I2C_data);
+	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
+	delay1000(100);
+}
 
 
 
