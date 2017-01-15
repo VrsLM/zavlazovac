@@ -79,12 +79,10 @@ void setWarm(float celsius) {
 void setDrought(int ADCvalue_humidity) {
 	if (ADCvalue_humidity > 2500) {
 		drought = 1; // polievaj - sucho
-	} else if (ADCvalue_humidity > 1500 && ADCvalue_humidity <= 2500) {
-		drought = 2; // polievaj = mierne sucho
 	} else {
-		drought = 3; // nepolievaj - mokro jak slak
+		drought = 2; // nepolievaj - mokro
 	}
-}
+	}
 
 void setShining(int I2C_data) {
 	if (I2C_data < 20) {
@@ -98,15 +96,15 @@ void setShining(int I2C_data) {
 
 void controlWatering() {
 
-	if (drought == 3) {
+	if (drought == 2) {
 		// je moc mokro, nepolievaj nic
 		GPIO_WriteBit(GPIOA, GPIO_Pin_8, Bit_RESET);
-		delay1000(100);
+		delay1000(1000);
 	} else if (drought == 1 && (warm == 1 || shining == 1)) {
 		// sucho  & chladno | noc ->> polievaj naplno
 		blinking(20, 40);
-	} else if ((drought == 1 || drought == 2) && (warm == 2 || shining == 2)) {
-		// sucho | mierne sucho && mierne teplo | den
+	} else if (drought == 1  && (warm == 2 || shining == 2)) {
+		// sucho  && mierne teplo | den
 		// ->> polievaj miernejsie ( moze to byt rano alebo nejaky jarny/jesenny den)
 		blinking(100, 10);
 	} else if (warm == 3 && shining == 3) {
