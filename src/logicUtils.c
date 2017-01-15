@@ -34,9 +34,7 @@ void printHumidity(uint16_t *ADCvalue_humidity) {
 }
 
 void printLightingX(unsigned int I2C_data) {
-	//*********** light senzor *********************/
-	readDataGY_30(&I2C_data);
-
+	//*********** light senzor*********************/
 	sprintf(poleChar, "svetlo: %d [lux]\r\n\n", I2C_data);
 	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
 	delay1000(100);

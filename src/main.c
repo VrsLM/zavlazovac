@@ -1,4 +1,5 @@
 #include <logic.h>
+#include "logicUtils.h"
 #include <stddef.h>
 #include "stm32l1xx.h"
 #include <stdio.h>
@@ -6,13 +7,10 @@
 #include "i2c.h"
 #include "GY_30.h"
 
-
-char poleChar[10];
 uint16_t ADCvalue_term;
 uint16_t ADCvalue_humidity;
 unsigned int I2C_data;
 float celsiusF;
-
 
 int main(void) {
 	gpio_init();
@@ -21,6 +19,7 @@ int main(void) {
 	initI2C1();
 	LED_init();
 	Status stat = initGY_30();
+
 
 //	startSystem();
 
@@ -37,6 +36,7 @@ int main(void) {
 		printHumidity(&ADCvalue_humidity);
 
 //*********** read value from light senzor and print *********************/
+		readDataGY_30(&I2C_data);
 		printLightingX(I2C_data);
 
 		GPIO_WriteBit(GPIOA, GPIO_Pin_8, Bit_RESET); // zhasnutie LED
@@ -48,7 +48,10 @@ int main(void) {
 	return 0;
 }
 
+conrrolWatering(){
 
+
+}
 
 
 

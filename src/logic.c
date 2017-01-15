@@ -8,30 +8,11 @@
 
 #include <logic.h>
 
+char poleChar[10];
 uint16_t ADCvalue = 0;
-float celsius;
 uint8_t pom = 0;
-extern char poleChar[10];
-uint8_t Posielaj=0;
-uint8_t i=0;
+uint8_t index=0;
 
-/////////**************init led***************////
-void LED_init (void)
-{
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
-
-	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_40MHz;
-	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8;
-	GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-}
-
-
-////////////////////////////
 
 void adc_init(void)
 {
@@ -59,7 +40,6 @@ void adc_init(void)
 
 	/* ADCx regular channel8 configuration */
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_0, 1, ADC_SampleTime_384Cycles);
-
 	ADC_ITConfig(ADC1,ADC_IT_EOC,ENABLE);
 
 
@@ -79,7 +59,6 @@ void adc_init(void)
 
 	/* Start conversion */
 	ADC_SoftwareStartConv(ADC1);
-
 }
 
 void gpio_init(void)
@@ -90,14 +69,11 @@ void gpio_init(void)
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE); // USART
 
-
 	/* Configure ADCx Channel 0 as analog input */
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-
 
 	/* Configure USART pins */
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;
@@ -142,6 +118,21 @@ void usart_init()
 
 }
 
+/////////**************init led***************////
+void LED_init (void)
+{
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+
+	GPIO_InitTypeDef GPIO_InitStruct;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_40MHz;
+	GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_8;
+	GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+}
+
 
 void ADC1_IRQHandler(void)
 {
@@ -149,19 +140,6 @@ void ADC1_IRQHandler(void)
 	{
 		ADCvalue = ADC_GetConversionValue(ADC1);
 	}
-}
-
-
-
-uint16_t readADC1_temp(uint8_t channel)
-{
-  ADC_RegularChannelConfig(ADC1, channel, 1, ADC_SampleTime_384Cycles);
-  // Start the conversion
-  ADC_SoftwareStartConv(ADC1);
-  // Wait until conversion completion
-  while(ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET);
-  // Get the conversion value
-  return ADC_GetConversionValue(ADC1);
 }
 
 
@@ -181,16 +159,27 @@ void USART2_IRQHandler()
 
 	if(USART_GetFlagStatus(USART2,USART_FLAG_TXE))
 	{
-		if(poleChar[i]!=0)
+		if(poleChar[index]!=0)
 		{
-			USART_SendData(USART2,poleChar[i++]);
+			USART_SendData(USART2,poleChar[index++]);
 		}
 		else
 		{
-			i=0;
+			index=0;
 			USART_ITConfig(USART2,USART_IT_TXE,DISABLE);
 		}
 	}
+}
+
+uint16_t readADC1_temp(uint8_t channel) {
+	ADC_RegularChannelConfig(ADC1, channel, 1, ADC_SampleTime_384Cycles);
+	// Start the conversion
+	ADC_SoftwareStartConv(ADC1);
+	// Wait until conversion completion
+	while (ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET)
+		;
+	// Get the conversion value
+	return ADC_GetConversionValue(ADC1);
 }
 
 
